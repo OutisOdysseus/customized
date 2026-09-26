@@ -30,6 +30,7 @@ import LockNotification from './lockNotification/lockNotification.jsx';
 
 import { DEFAULT_BREW_LOAD }                  from '../../../../server/brewDefaults.js';
 import { printCurrentBrew, fetchThemeBundle } from '../../../../shared/helpers.js';
+import { replaceRoute }                       from '../../utils/navigation.js';
 
 import { updateHistory, versionHistoryGarbageCollection } from '../../utils/versionHistory.js';
 
@@ -254,7 +255,7 @@ const EditPage = (props)=>{
 			...updatedFields
 		}));
 
-		history.replaceState(null, null, `/edit/${res.body.editId}`);
+		replaceRoute(`/edit/${res.body.editId}`);
 	};
 
 	const renderGoogleDriveIcon = ()=>(

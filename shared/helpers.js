@@ -116,12 +116,17 @@ const printCurrentBrew = ()=>{
 	}
 };
 
+//Pages that don't show errors (the share page) don't pass a setter
+const setErrorIfAny = (setError, error)=>{
+	if(typeof setError === 'function') setError(error);
+};
+
 const fetchThemeBundle = async (setError, setThemeBundle, renderer, theme)=>{
 	if(!renderer || !theme) return;
 	const res = await request
 			.get(`/api/theme/${renderer}/${theme}`)
 			.catch((err)=>{
-				setError(err)
+				setErrorIfAny(setError, err)
 			});
 	if(!res) {
 		setThemeBundle({});
@@ -130,7 +135,7 @@ const fetchThemeBundle = async (setError, setThemeBundle, renderer, theme)=>{
 	const themeBundle = res.body;
 	themeBundle.joinedStyles = themeBundle.styles.map((style)=>`<style>${style}</style>`).join('\n\n');
 	setThemeBundle(themeBundle);
-	setError(null);
+	setErrorIfAny(setError, null);
 };
 
 const debugTextMismatch = (clientTextRaw, serverTextRaw, label) => {

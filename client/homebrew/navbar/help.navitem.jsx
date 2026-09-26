@@ -2,6 +2,7 @@ const React = require('react');
 const dedent = require('dedent-tabs').default;
 
 const Nav = require('naturalcrit/nav/nav.jsx');
+const { href } = require('../utils/navigation.js');
 
 module.exports = function(props){
 	return <Nav.dropdown>
@@ -19,13 +20,13 @@ module.exports = function(props){
 			report issue
 		</Nav.item>
 		<Nav.item color='green' icon='fas fa-question-circle'
-			href='/faq'
+			href={href('/faq')}
 			newTab={true}
 			rel='noopener noreferrer'>
 			FAQ
 		</Nav.item>
 		<Nav.item color='blue' icon='fas fa-fw fa-file-import'
-			href='/migrate'
+			href={href('/migrate')}
 			newTab={true}
 			rel='noopener noreferrer'>
 			migrate

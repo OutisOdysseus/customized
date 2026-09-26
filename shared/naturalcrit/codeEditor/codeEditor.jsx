@@ -5,6 +5,12 @@ const createClass = require('create-react-class');
 const _ = require('lodash');
 const closeTag = require('./close-tag');
 const autoCompleteEmoji = require('./autocompleteEmoji');
+const { isStandalone } = require('client/homebrew/utils/mode.js');
+const { assetUrl } = require('client/homebrew/utils/navigation.js');
+
+//The editor theme stylesheets live at /homebrew/cm-themes on the server, and next to
+//the bundle in the standalone build (inline in the single-file one)
+const cmThemeUrl = (themeName)=>isStandalone() ? assetUrl(`/homebrew/cm-themes/${themeName}.css`) : `../homebrew/cm-themes/${themeName}.css`;
 
 let CodeMirror;
 if(typeof window !== 'undefined'){
@@ -455,7 +461,7 @@ const CodeEditor = createClass({
 
 	render : function(){
 		return <>
-			<link href={`../homebrew/cm-themes/${this.props.editorTheme}.css`} type='text/css' rel='stylesheet' />
+			<link href={cmThemeUrl(this.props.editorTheme)} type='text/css' rel='stylesheet' />
 			<div className='codeEditor' ref={this.editor} style={this.props.style}/>
 		</>;
 	}

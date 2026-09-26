@@ -2,6 +2,9 @@ const React = require('react');
 const createClass = require('create-react-class');
 const Nav = require('naturalcrit/nav/nav.jsx');
 const request = require('superagent');
+const { href, navigate } = require('../utils/navigation.js');
+const { isStandalone } = require('../utils/mode.js');
+const { clearLocalAccount } = require('../utils/localStore.js');
 
 const Account = createClass({
 	displayName     : 'AccountNavItem',
@@ -23,6 +26,12 @@ const Account = createClass({
 		if(confirm('Are you sure you want to log out?')) {
 			// Reset divider position
 			window.localStorage.removeItem('naturalcrit-pane-split');
+			if(isStandalone()) {
+				// No server, so the account is just the one saved in local storage
+				clearLocalAccount();
+				navigate('/');
+				return;
+			}
 			// Clear login cookie
 			let domain = '';
 			if(window.location?.hostname) {
@@ -54,6 +63,12 @@ const Account = createClass({
 				});
 		if(!token) return;
 
+		if(isStandalone()) {
+			// The account was saved to local storage by the local login; there is no cookie to set
+			window.location.reload();
+			return;
+		}
+
 		document.cookie = `nc_session=${token};expires=${expiry};path=/;samesite=lax;${window.domain ? `domain=${window.domain}` : ''}`;
 		window.location.reload(true);
 	},
@@ -70,7 +85,7 @@ const Account = createClass({
 					{global.account.username}
 				</Nav.item>
 				<Nav.item
-					href={`/user/${encodeURI(global.account.username)}`}
+					href={href(`/user/${encodeURI(global.account.username)}`)}
 					color='yellow'
 					icon='fas fa-beer'
 				>
@@ -80,7 +95,7 @@ const Account = createClass({
 					className='account'
 					color='orange'
 					icon='fas fa-user'
-					href='/account'
+					href={href('/account')}
 				>
 					account
 				</Nav.item>

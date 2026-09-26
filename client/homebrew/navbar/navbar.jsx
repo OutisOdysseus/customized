@@ -4,6 +4,7 @@ const createClass = require('create-react-class');
 
 const Nav = require('naturalcrit/nav/nav.jsx');
 const PatreonNavItem = require('./patreon.navitem.jsx');
+const { href } = require('../utils/navigation.js');
 
 const Navbar = createClass({
 	displayName     : 'Navbar',
@@ -35,10 +36,10 @@ const Navbar = createClass({
 		return <Nav.base>
 			<Nav.section>
 				<Nav.logo />
-				<Nav.item href='/' className='homebrewLogo'>
+				<Nav.item href={href('/')} className='homebrewLogo'>
 					<div>The Homebrewery</div>
 				</Nav.item>
-				<Nav.item newTab={true} href='/changelog' color='purple' icon='far fa-file-alt'>
+				<Nav.item newTab={true} href={href('/changelog')} color='purple' icon='far fa-file-alt'>
 					{`v${this.state.ver}`}
 				</Nav.item>
 				<PatreonNavItem />

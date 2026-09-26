@@ -16,6 +16,8 @@
     "quick": "node --experimental-require-module scripts/quick.js",
     "build": "node --experimental-require-module scripts/buildHomebrew.js && node --experimental-require-module scripts/buildAdmin.js",
     "builddev": "node --experimental-require-module scripts/buildHomebrew.js --dev",
+    "build:standalone": "node --experimental-require-module scripts/buildStandalone.js",
+    "build:single": "node --experimental-require-module scripts/buildStandalone.js && node --experimental-require-module scripts/buildSingleFile.js",
     "lint": "eslint --fix",
     "lint:dry": "eslint",
     "stylelint": "stylelint --fix **/*.{less}",
@@ -59,7 +61,7 @@
       "server"
     ],
     "transformIgnorePatterns": [
-      "node_modules/(?!nanoid/).*"
+      "node_modules/(?!(nanoid|idb-keyval)/).*"
     ],
     "coveragePathIgnorePatterns": [
       "build/*"
@@ -78,6 +80,9 @@
         "lines": 70
       }
     },
+    "setupFiles": [
+      "<rootDir>/jest.setup.js"
+    ],
     "setupFilesAfterEnv": [
       "jest-expect-message"
     ]
@@ -141,8 +146,10 @@
     "eslint": "^9.35.0",
     "eslint-plugin-jest": "^29.0.1",
     "eslint-plugin-react": "^7.37.5",
+    "fake-indexeddb": "^6.2.5",
     "globals": "^16.3.0",
     "jest": "^30.1.3",
+    "jest-environment-jsdom": "^30.5.2",
     "jest-expect-message": "^1.1.3",
     "jsdom-global": "^3.0.2",
     "postcss-less": "^6.0.0",

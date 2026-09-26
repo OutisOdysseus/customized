@@ -9,6 +9,7 @@ const TagInput = require('../tagInput/tagInput.jsx');
 
 
 const Themes = require('themes/themes.json');
+const { assetUrl, href, navigate } = require('../../utils/navigation.js');
 const validations = require('./validations.js');
 
 const SYSTEMS = ['5e', '4e', '3.5e', 'Pathfinder'];
@@ -151,7 +152,7 @@ const MetadataEditor = createClass({
 				if(err) {
 					this.props.reportError(err);
 				} else {
-					window.location.href = '/';
+					navigate('/');
 				}
 			});
 	},
@@ -214,8 +215,8 @@ const MetadataEditor = createClass({
 		const listThemes = (renderer)=>{
 			return _.map(_.values(mergedThemes[renderer]), (theme)=>{
 				if(theme.path == this.props.metadata.shareId) return;
-				const preview = theme.thumbnail || `/themes/${theme.renderer}/${theme.path}/dropdownPreview.png`;
-				const texture = theme.thumbnail || `/themes/${theme.renderer}/${theme.path}/dropdownTexture.png`;
+				const preview = theme.thumbnail || assetUrl(`/themes/${theme.renderer}/${theme.path}/dropdownPreview.png`);
+				const texture = theme.thumbnail || assetUrl(`/themes/${theme.renderer}/${theme.path}/dropdownTexture.png`);
 				return <div className='item' key={`${renderer}_${theme.name}`} value={`${theme.author ?? renderer} : ${theme.name}`} data={theme} title={''}>
 					{theme.author ?? renderer} : {theme.name}
 					<div className='texture-container'>
@@ -331,7 +332,7 @@ const MetadataEditor = createClass({
 						onChange={(e)=>this.handleRenderer('V3', e)} />
 					V3
 				</label>
-				<small><a href='/legacy' target='_blank' rel='noopener noreferrer'>Click here to see the demo page for the old Legacy renderer!</a></small>
+				<small><a href={href('/legacy')} target='_blank' rel='noopener noreferrer'>Click here to see the demo page for the old Legacy renderer!</a></small>
 			</div>
 		</div>;
 	},
@@ -405,7 +406,7 @@ const MetadataEditor = createClass({
 				<label>publish</label>
 				<div className='value'>
 					{this.renderPublish()}
-					<small>Published brews are searchable in <a href='/vault'>the Vault</a> and visible on your user page.  Unpublished brews are not indexed in the Vault or visible on your user page, but can still be shared and indexed by search engines.  You can unpublish a brew any time.</small>
+					<small>Published brews are searchable in <a href={href('/vault')}>the Vault</a> and visible on your user page.  Unpublished brews are not indexed in the Vault or visible on your user page, but can still be shared and indexed by search engines.  You can unpublish a brew any time.</small>
 				</div>
 			</div>
 
