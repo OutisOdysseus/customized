@@ -14,6 +14,7 @@ import { both as RecentNavItem }       from '../../navbar/recent.navitem.jsx';
 import AccountNavItem                  from '../../navbar/account.navitem.jsx';
 import ErrorNavItem                    from '../../navbar/error-navitem.jsx';
 import { fetchThemeBundle }            from '../../../../shared/helpers.js';
+import { href, navigate }              from '../../utils/navigation.js';
 
 import SplitPane                       from 'client/components/splitPane/splitPane.jsx';
 import Editor                          from '../../editor/editor.jsx';
@@ -52,7 +53,7 @@ const HomePage =(props)=>{
 					return;
 				}
 				const saved = res.body;
-				window.location = `/edit/${saved.editId}`;
+				navigate(`/edit/${saved.editId}`);
 			});
 	};
 
@@ -132,7 +133,7 @@ const HomePage =(props)=>{
 				Save current <i className='fas fa-save' />
 			</div>
 
-			<a href='/new' className='floatingNewButton'>
+			<a href={href('/new')} className='floatingNewButton'>
 				Create your own <i className='fas fa-magic' />
 			</a>
 		</div>

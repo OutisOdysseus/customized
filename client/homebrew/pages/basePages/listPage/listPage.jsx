@@ -6,6 +6,8 @@ const _           = require('lodash');
 const moment      = require('moment');
 
 const BrewItem    = require('./brewItem/brewItem.jsx');
+const { assetUrl, updateUrlQuery } = require('../../../../homebrew/utils/navigation.js');
+const { themeStyleSheet } = require('../../../../homebrew/utils/localApi.js');
 
 const USERPAGE_KEY_PREFIX = 'HOMEBREWERY-LISTPAGE';
 
@@ -138,39 +140,35 @@ const ListPage = createClass({
 	},
 
 	updateUrl : function(filterTerm, sortType, sortDir, filterTag=''){
-		const url = new URL(window.location.href);
-		const urlParams = new URLSearchParams(url.search);
+		updateUrlQuery((urlParams)=>{
+			urlParams.set('sort', sortType);
+			urlParams.set('dir', sortDir);
 
-		urlParams.set('sort', sortType);
-		urlParams.set('dir', sortDir);
-
-		let filterTags = urlParams.getAll('tag');
-		if(filterTag != '') {
-			if(filterTags.findIndex((tag)=>{return tag.toLowerCase()==filterTag.toLowerCase();}) == -1){
-				filterTags.push(filterTag);
-			} else {
-				filterTags = filterTags.filter((tag)=>{ return tag.toLowerCase() != filterTag.toLowerCase(); });
+			let filterTags = urlParams.getAll('tag');
+			if(filterTag != '') {
+				if(filterTags.findIndex((tag)=>{return tag.toLowerCase()==filterTag.toLowerCase();}) == -1){
+					filterTags.push(filterTag);
+				} else {
+					filterTags = filterTags.filter((tag)=>{ return tag.toLowerCase() != filterTag.toLowerCase(); });
+				}
 			}
-		}
-		urlParams.delete('tag');
-		// Add tags to URL in the order they were clicked
-		filterTags.forEach((tag)=>{ urlParams.append('tag', tag); });
-		// Sort tags before updating state
-		filterTags.sort((a, b)=>{
-			return a.indexOf(':') - b.indexOf(':') != 0 ? a.indexOf(':') - b.indexOf(':') : a.toLowerCase().localeCompare(b.toLowerCase());
+			urlParams.delete('tag');
+			// Add tags to URL in the order they were clicked
+			filterTags.forEach((tag)=>{ urlParams.append('tag', tag); });
+			// Sort tags before updating state
+			filterTags.sort((a, b)=>{
+				return a.indexOf(':') - b.indexOf(':') != 0 ? a.indexOf(':') - b.indexOf(':') : a.toLowerCase().localeCompare(b.toLowerCase());
+			});
+
+			this.setState({
+				filterTags
+			});
+
+			if(!filterTerm)
+				urlParams.delete('filter');
+			else
+				urlParams.set('filter', filterTerm);
 		});
-
-		this.setState({
-			filterTags
-		});
-
-		if(!filterTerm)
-			urlParams.delete('filter');
-		else
-			urlParams.set('filter', filterTerm);
-
-		url.search = urlParams;
-		window.history.replaceState(null, null, url);
 	},
 
 	renderFilterOption : function(){
@@ -260,10 +258,16 @@ const ListPage = createClass({
 	},
 
 	render : function(){
+		//The precompiled themes only exist when there is no server to load them from
+		const blankTheme = themeStyleSheet('V3', 'Blank');
+		const phbTheme = themeStyleSheet('V3', '5ePHB');
 		return <div className='listPage sitePage'>
-			{/*<style>@layer V3_5ePHB, bundle;</style>*/}
-			<link href='/themes/V3/Blank/style.css' type='text/css' rel='stylesheet'/>
-			<link href='/themes/V3/5ePHB/style.css' type='text/css' rel='stylesheet'/>
+			{blankTheme
+				? <style dangerouslySetInnerHTML={{ __html: blankTheme }} />
+				: <link href={assetUrl('/themes/V3/Blank/style.css')} type='text/css' rel='stylesheet'/>}
+			{phbTheme
+				? <style dangerouslySetInnerHTML={{ __html: phbTheme }} />
+				: <link href={assetUrl('/themes/V3/5ePHB/style.css')} type='text/css' rel='stylesheet'/>}
 			{this.props.navItems}
 			{this.renderSortOptions()}
 			{this.renderTagsOptions()}

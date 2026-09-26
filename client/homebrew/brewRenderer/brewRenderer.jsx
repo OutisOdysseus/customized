@@ -18,18 +18,40 @@ const { printCurrentBrew } = require('../../../shared/helpers.js');
 
 import HeaderNav from './headerNav/headerNav.jsx';
 import { safeHTML } from './safeHTML.js';
+import { isStandalone } from '../utils/mode.js';
+import { assetUrl } from '../utils/navigation.js';
+import { appStyles, resolveCssUrls, inlineHtmlAssets } from '../utils/inlineAssets.js';
+import { getStaticThemeStyles } from '../utils/localApi.js';
 
 const PAGEBREAK_REGEX_V3 = /^(?=\\page(?:break)?(?: *{[^\n{}]*})?$)/m;
 const PAGEBREAK_REGEX_LEGACY = /\\page(?:break)?/m;
 const COLUMNBREAK_REGEX_LEGACY = /\\column(:?break)?/m;
 const PAGE_HEIGHT = 1056;
 
-const INITIAL_CONTENT = dedent`
+//Anything the page rendered inside the iframe needs. The app's stylesheet normally
+//lives at /homebrew/bundle.css, but the standalone build keeps it next to index.html
+//(and the single-file build carries it in the page as text).
+let cachedInitialContent = null;
+const initialContent = ()=>{
+	if(cachedInitialContent) return cachedInitialContent;
+	const inlinedCss = appStyles();
+	const stylesheet = inlinedCss
+		? `<style>${inlinedCss}</style>`
+		: `<link href='${isStandalone() ? assetUrl('/bundle.css') : '/homebrew/bundle.css'}' type="text/css" rel='stylesheet' />`;
+	cachedInitialContent = dedent`
 	<!DOCTYPE html><html><head>
 	<link href="//fonts.googleapis.com/css?family=Open+Sans:400,300,600,700" rel="stylesheet" type="text/css" />
-	<link href='/homebrew/bundle.css' type="text/css" rel='stylesheet' />
+	${stylesheet}
 	<base target=_blank>
 	</head><body style='overflow: hidden'><div></div></body></html>`;
+	return cachedInitialContent;
+};
+
+//Themes are precompiled into the bundle when there is no server to request them from
+const defaultThemeStyles = ()=>{
+	if(isStandalone()) return `<style>${getStaticThemeStyles('V3', 'Blank')}</style>`;
+	return '<style>@import url("/themes/V3/Blank/style.css");</style>';
+};
 
 
 //v=====----------------------< Brew Page Component >---------------------=====v//
@@ -40,7 +62,7 @@ const BrewPage = (props)=>{
 		...props
 	};
 	const pageRef   = useRef(null);
-	const cleanText = safeHTML(props.contents);
+	const cleanText = inlineHtmlAssets(safeHTML(props.contents));
 
 	useEffect(()=>{
 		if(!pageRef.current) return;
@@ -174,8 +196,9 @@ const BrewRenderer = (props)=>{
 	};
 
 	const renderStyle = ()=>{
-		const themeStyles = props.themeBundle?.joinedStyles ?? '<style>@import url("/themes/V3/Blank/style.css");</style>';
-		const cleanStyle = safeHTML(`${themeStyles} \n\n <style> ${props.style} </style>`);
+		const themeStyles = props.themeBundle?.joinedStyles ?? defaultThemeStyles();
+		//The single-file build embeds the fonts/images the theme css points at
+		const cleanStyle = safeHTML(resolveCssUrls(`${themeStyles} \n\n <style> ${props.style} </style>`));
 		return <div style={{ display: 'none' }} dangerouslySetInnerHTML={{ __html: cleanStyle }} />;
 	};
 
@@ -265,7 +288,8 @@ const BrewRenderer = (props)=>{
 	};
 
 	const frameDidMount = ()=>{	//This triggers when iFrame finishes internal "componentDidMount"
-		scrollToHash(window.location.hash);
+		//In the standalone build the hash holds the route, not an anchor to jump to
+		if(!isStandalone()) scrollToHash(window.location.hash);
 
 		setTimeout(()=>{	//We still see a flicker where the style isn't applied yet, so wait 100ms before showing iFrame
 			renderPages(); //Make sure page is renderable before showing
@@ -322,7 +346,7 @@ const BrewRenderer = (props)=>{
 			<ToolBar displayOptions={displayOptions} onDisplayOptionsChange={handleDisplayOptionsChange} visiblePages={state.visiblePages.length > 0 ? state.visiblePages : [state.centerPage]} totalPages={rawPages.length} headerState={headerState} setHeaderState={setHeaderState}/>
 
 			{/*render in iFrame so broken code doesn't crash the site.*/}
-			<Frame id='BrewRenderer' initialContent={INITIAL_CONTENT}
+			<Frame id='BrewRenderer' initialContent={initialContent()}
 				style={{ width: '100%', height: '100%', visibility: state.visibility }}
 				contentDidMount={frameDidMount}
 				onClick={()=>{emitClick();}}

@@ -13,6 +13,8 @@ const BrewRenderer = require('../../brewRenderer/brewRenderer.jsx');
 
 const { DEFAULT_BREW_LOAD } = require('../../../../server/brewDefaults.js');
 const { printCurrentBrew, fetchThemeBundle } = require('../../../../shared/helpers.js');
+const { href } = require('../../utils/navigation.js');
+const { downloadBrew, openBrewSource, serverLinkProps } = require('../../utils/localExport.js');
 
 const SharePage = (props)=>{
 	const { brew = DEFAULT_BREW_LOAD, disableMeta = false } = props;
@@ -53,7 +55,7 @@ const SharePage = (props)=>{
 		const editLink = brew.googleId && ! brew.stubbed ? brew.googleId + brew.editId : brew.editId;
 
 		return (
-			<Nav.item color='orange' icon='fas fa-pencil-alt' href={`/edit/${editLink}`}>
+			<Nav.item color='orange' icon='fas fa-pencil-alt' href={href(`/edit/${editLink}`)}>
 				edit
 			</Nav.item>
 		);
@@ -81,14 +83,14 @@ const SharePage = (props)=>{
 								<Nav.item color='red' icon='fas fa-code'>
 									source
 								</Nav.item>
-								<Nav.item color='blue' icon='fas fa-eye' href={`/source/${processShareId()}`}>
+								<Nav.item color='blue' icon='fas fa-eye' {...serverLinkProps(`/source/${processShareId()}`, ()=>openBrewSource(processShareId()))}>
 									view
 								</Nav.item>
 								{renderEditLink()}
-								<Nav.item color='blue' icon='fas fa-download' href={`/download/${processShareId()}`}>
+								<Nav.item color='blue' icon='fas fa-download' {...serverLinkProps(`/download/${processShareId()}`, ()=>downloadBrew(processShareId()))}>
 									download
 								</Nav.item>
-								<Nav.item color='blue' icon='fas fa-clone' href={`/new/${processShareId()}`}>
+								<Nav.item color='blue' icon='fas fa-clone' href={href(`/new/${processShareId()}`)}>
 									clone to new
 								</Nav.item>
 							</Nav.dropdown>

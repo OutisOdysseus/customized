@@ -16,6 +16,8 @@ const SplitPane     = require('client/components/splitPane/splitPane.jsx');
 const ErrorIndex    = require('../errorPage/errors/errorIndex.js');
 
 import request from '../../utils/request-middleware.js';
+import { assetUrl, updateUrlQuery } from '../../utils/navigation.js';
+import { themeStyleSheet } from '../../utils/localApi.js';
 
 const VaultPage = (props)=>{
 	const [pageState, setPageState] = useState(parseInt(props.query.page) || 1);
@@ -48,20 +50,16 @@ const VaultPage = (props)=>{
 	};
 
 	const updateUrl = (titleValue, authorValue, countValue, v3Value, legacyValue, page, sort, dir)=>{
-		const url = new URL(window.location.href);
-		const urlParams = new URLSearchParams(url.search);
-
-		urlParams.set('title', titleValue);
-		urlParams.set('author', authorValue);
-		urlParams.set('count', countValue);
-		urlParams.set('v3', v3Value);
-		urlParams.set('legacy', legacyValue);
-		urlParams.set('page', page);
-		urlParams.set('sort', sort);
-		urlParams.set('dir', dir);
-
-		url.search = urlParams.toString();
-		window.history.replaceState(null, '', url.toString());
+		updateUrlQuery((urlParams)=>{
+			urlParams.set('title', titleValue);
+			urlParams.set('author', authorValue);
+			urlParams.set('count', countValue);
+			urlParams.set('v3', v3Value);
+			urlParams.set('legacy', legacyValue);
+			urlParams.set('page', page);
+			urlParams.set('sort', sort);
+			urlParams.set('dir', dir);
+		});
 	};
 
 	const performSearch = async (title, author, count, v3, legacy, page, sort, dir)=>{
@@ -411,10 +409,18 @@ const VaultPage = (props)=>{
 		);
 	};
 
+	//The precompiled themes only exist when there is no server to load them from
+	const blankTheme = themeStyleSheet('V3', 'Blank');
+	const phbTheme = themeStyleSheet('V3', '5ePHB');
+
 	return (
 		<div className='sitePage vaultPage'>
-			<link href='/themes/V3/Blank/style.css' rel='stylesheet' />
-			<link href='/themes/V3/5ePHB/style.css' rel='stylesheet' />
+			{blankTheme
+				? <style dangerouslySetInnerHTML={{ __html: blankTheme }} />
+				: <link href={assetUrl('/themes/V3/Blank/style.css')} rel='stylesheet' />}
+			{phbTheme
+				? <style dangerouslySetInnerHTML={{ __html: phbTheme }} />
+				: <link href={assetUrl('/themes/V3/5ePHB/style.css')} rel='stylesheet' />}
 			{renderNavItems()}
 			<div className='content'>
 				<SplitPane showDividerButtons={false}>

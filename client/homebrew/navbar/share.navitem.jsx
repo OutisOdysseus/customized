@@ -1,6 +1,7 @@
 import React from 'react';
 import dedent from 'dedent-tabs';
 import Nav from 'naturalcrit/nav/nav.jsx';
+import { href } from '../utils/navigation.js';
 
 	const getShareId = (brew)=>(
 		brew.googleId && !brew.stubbed
@@ -22,7 +23,7 @@ export default ({brew}) => (
 		<Nav.item color='teal' icon='fas fa-share-alt'>
 			share
 		</Nav.item>
-		<Nav.item color='blue' href={`/share/${getShareId(brew)}`}>
+		<Nav.item color='blue' href={href(`/share/${getShareId(brew)}`)}>
 			view
 		</Nav.item>
 		<Nav.item color='blue' onClick={()=>{navigator.clipboard.writeText(`${global.config.baseUrl}/share/${getShareId(brew)}`);}}>

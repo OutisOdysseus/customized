@@ -2,6 +2,10 @@ const dedent = require('dedent-tabs').default;
 
 const loginUrl = 'https://www.naturalcrit.com/login';
 
+//The app is served from the hash in the standalone build, so in-app links are
+//built from the configured base url (which already carries the hash there)
+const routeUrl = (path)=>`${global.config?.baseUrl ?? ''}${path}`;
+
 // Prevent parsing text (e.g. document titles) as markdown
 const escape = (text = '')=>{
 	return text.split('').map((char)=>`&#${char.charCodeAt(0)};`).join('');
@@ -96,9 +100,9 @@ const errorIndex = (props)=>{
 
 		**Brew Title:** ${escape(props.brew.brewTitle) || 'Unable to show title'}
 
-		**Current Authors:** ${props.brew.authors?.map((author)=>{return `[${author}](/user/${author})`;}).join(', ') || 'Unable to list authors'}
+		**Current Authors:** ${props.brew.authors?.map((author)=>{return `[${author}](${routeUrl(`/user/${author}`)})`;}).join(', ') || 'Unable to list authors'}
 		
-		[Click here to be redirected to the brew's share page.](/share/${props.brew.shareId})`,
+		[Click here to be redirected to the brew's share page.](${routeUrl(`/share/${props.brew.shareId}`)})`,
 
 		// User is not signed in; must be a user on the Authors List
 		'04' : dedent`
@@ -111,9 +115,9 @@ const errorIndex = (props)=>{
 
 		**Brew Title:** ${escape(props.brew.brewTitle) || 'Unable to show title'}
 
-		**Current Authors:** ${props.brew.authors?.map((author)=>{return `[${author}](/user/${author})`;}).join(', ') || 'Unable to list authors'}
+		**Current Authors:** ${props.brew.authors?.map((author)=>{return `[${author}](${routeUrl(`/user/${author}`)})`;}).join(', ') || 'Unable to list authors'}
 
-		[Click here to be redirected to the brew's share page.](/share/${props.brew.shareId})`,
+		[Click here to be redirected to the brew's share page.](${routeUrl(`/share/${props.brew.shareId}`)})`,
 
 
 		// Brew load error
@@ -216,7 +220,7 @@ const errorIndex = (props)=>{
 		
 		**Brew Title:** ${escape(props.brew.brewTitle)}
 		
-		**Brew Authors:**  ${props.brew.authors?.map((author)=>{return `[${author}](/user/${author})`;}).join(', ') || 'Unable to list authors'}`,
+		**Brew Authors:**  ${props.brew.authors?.map((author)=>{return `[${author}](${routeUrl(`/user/${author}`)})`;}).join(', ') || 'Unable to list authors'}`,
 
 		// ####### Admin page error #######
 		'52' : dedent`

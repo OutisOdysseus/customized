@@ -42,7 +42,12 @@ const build = async ({ bundle, render, ssr })=>{
 	}
 };
 
-fs.emptyDirSync('./build');
+//The standalone (serverless) build lives in ./build/standalone as well; it is built
+//separately with `npm run build:standalone`, so it is left untouched here
+fs.ensureDirSync('./build');
+fs.readdirSync('./build')
+	.filter((file)=>file !== 'standalone')
+	.forEach((file)=>fs.removeSync(`./build/${file}`));
 
 
 (async ()=>{

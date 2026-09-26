@@ -19,6 +19,7 @@ import BrewRenderer from '../../brewRenderer/brewRenderer.jsx';
 
 import { DEFAULT_BREW }                       from '../../../../server/brewDefaults.js';
 import { printCurrentBrew, fetchThemeBundle, splitTextStyleAndMetadata } from '../../../../shared/helpers.js';
+import { navigate, replaceRoute, routeFromLocation } from '../../utils/navigation.js';
 
 const BREWKEY  = 'homebrewery-new';
 const STYLEKEY = 'homebrewery-new-style';
@@ -76,8 +77,8 @@ const NewPage = (props) => {
 		if(brew.style)
 			localStorage.setItem(STYLEKEY, brew.style);
 		localStorage.setItem(METAKEY, JSON.stringify({ renderer: brew.renderer, theme: brew.theme, lang: brew.lang }));
-		if(window.location.pathname !== '/new')
-			window.history.replaceState({}, window.location.title, '/new/');
+		if(!routeFromLocation().startsWith('/new'))
+			replaceRoute('/new');
 	};
 
 	const handleControlKeys = (e) => {
@@ -169,7 +170,7 @@ const NewPage = (props) => {
 		localStorage.removeItem(BREWKEY);
 		localStorage.removeItem(STYLEKEY);
 		localStorage.removeItem(METAKEY);
-		window.location = `/edit/${savedBrew.editId}`;
+		navigate(`/edit/${savedBrew.editId}`);
 	};
 
 	const renderSaveButton = ()=>{

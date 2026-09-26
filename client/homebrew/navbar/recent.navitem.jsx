@@ -4,6 +4,7 @@ const _ = require('lodash');
 const Moment = require('moment');
 
 const Nav = require('naturalcrit/nav/nav.jsx');
+const { href } = require('../utils/navigation.js');
 
 const EDIT_KEY = 'homebrewery-recently-edited';
 const VIEW_KEY = 'homebrewery-recently-viewed';
@@ -144,7 +145,7 @@ const RecentItems = createClass({
 
 		const makeItems = (brews)=>{
 			return _.map(brews, (brew, i)=>{
-				return <a className='navItem' href={brew.url} key={`${brew.id}-${i}`} target='_blank' rel='noopener noreferrer' title={brew.title || '[ no title ]'}>
+				return <a className='navItem' href={href(brew.url)} key={`${brew.id}-${i}`} target='_blank' rel='noopener noreferrer' title={brew.title || '[ no title ]'}>
 					<span className='title'>{brew.title || '[ no title ]'}</span>
 					<span className='time'>{Moment(brew.ts).fromNow()}</span>
 					<div className='clear' title='Remove from Recents' onClick={(e)=>{this.removeItem(`${brew.url}`, e);}}><i className='fas fa-times'></i></div>

@@ -1,6 +1,7 @@
 const React = require('react');
 const _ = require('lodash');
 const Nav = require('naturalcrit/nav/nav.jsx');
+const { href, navigate } = require('../utils/navigation.js');
 const { splitTextStyleAndMetadata } = require('../../../shared/helpers.js'); // Importing the function from helpers.js
 
 const BREWKEY  = 'homebrewery-new';
@@ -29,7 +30,7 @@ const NewBrew = ()=>{
 				localStorage.setItem(METAKEY, JSON.stringify(
 					_.pick(newBrew, ['title', 'description', 'tags', 'systems', 'renderer', 'theme', 'lang'])
 				));
-				window.location.href = '/new';
+				navigate('/new');
 				return;
 			}
 
@@ -54,7 +55,7 @@ const NewBrew = ()=>{
 			</Nav.item>
 			<Nav.item
 				className='fromBlank'
-				href='/new'
+				href={href('/new')}
 				newTab={true}
 				color='purple'
 				icon='fa-solid fa-file'>
